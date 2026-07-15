@@ -91,8 +91,11 @@ function photoTransform() {
 }
 
 function applyPhotoTransform() {
-  previewPhoto.style.transform = photoTransform();
   photoEditorImage.style.transform = photoTransform();
+}
+
+function applyPreviewPhotoTransform() {
+  previewPhoto.style.transform = photoTransform();
 }
 
 function openPhotoModal(src) {
@@ -239,7 +242,7 @@ photoCancel.addEventListener('click', () => {
 
 photoAccept.addEventListener('click', () => {
   previewPhoto.src = pendingPhotoData;
-  previewPhoto.style.transform = photoTransform();
+  applyPreviewPhotoTransform();
   setPhotoShape(photoShape);
   closePhotoModal();
 });

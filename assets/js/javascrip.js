@@ -11,8 +11,10 @@ const closeStart = document.getElementById('closeStart');
 const chooseTemplate = document.getElementById('chooseTemplate');
 const colorPills = document.getElementById('colorPills');
 const startGallery = document.getElementById('startGallery');
-const templateGrid = document.getElementById('templateGrid');
 const photoFrame = document.querySelector('.photo-editor-frame');
+const photoEditorFrame = document.getElementById('photoEditorFrame');
+const shapeCircle = document.getElementById('shapeCircle');
+const shapeSquare = document.getElementById('shapeSquare');
 
 const bindings = {
   name: document.getElementById('previewName'),
@@ -32,31 +34,20 @@ const bindings = {
 const inputs = ['name', 'headline', 'email', 'phone', 'website', 'location', 'summary', 'experience1', 'experience2', 'education', 'skills', 'languages']
   .reduce((acc, id) => ({ ...acc, [id]: document.getElementById(id) }), {});
 
-const scrollToTemplates = document.getElementById('scrollToTemplates');
+const scrollToTop = document.getElementById('scrollToTemplates');
 const openExport = document.getElementById('openExport');
 const closeExport = document.getElementById('closeExport');
 const printCv = document.getElementById('printCv');
 const downloadPdf = document.getElementById('downloadPdf');
 
-const baseTemplates = [
-  { id: 'classic', label: 'Classic', desc: 'Profesional, limpio y equilibrado' },
-  { id: 'sidebar', label: 'Sidebar', desc: 'Columna lateral con contraste' },
-  { id: 'modern', label: 'Modern', desc: 'Minimalista con bloques grandes' },
-  { id: 'executive', label: 'Executive', desc: 'Oscuro y elegante' },
-  { id: 'compact', label: 'Compact', desc: 'Más información en menos espacio' },
-];
-
-const palette = [
-  { name: 'navy', color: '#0c5a8d' },
-  { name: 'sand', color: '#c18b2a' },
-  { name: 'slate', color: '#334155' },
-  { name: 'forest', color: '#166534' },
-  { name: 'wine', color: '#7c2d12' },
-  { name: 'sky', color: '#2563eb' },
-  { name: 'graphite', color: '#1f2937' },
-  { name: 'rose', color: '#be185d' },
-  { name: 'teal', color: '#0f766e' },
-  { name: 'violet', color: '#5b21b6' },
+const presetCount = 50;
+const layouts = ['a', 'b', 'c', 'd', 'e'];
+const accents = [
+  { name: 'navy', accent: '#eab308', dark: '#243b53' },
+  { name: 'teal', accent: '#14b8a6', dark: '#0f766e' },
+  { name: 'brick', accent: '#fb923c', dark: '#7c2d12' },
+  { name: 'violet', accent: '#c4b5fd', dark: '#5b21b6' },
+  { name: 'graphite', accent: '#60a5fa', dark: '#111827' },
 ];
 
 let pendingPhotoData = '';
@@ -64,7 +55,8 @@ let photoState = { zoom: 1, x: 0, y: 0 };
 let dragging = false;
 let dragStart = { x: 0, y: 0 };
 let dragOrigin = { x: 0, y: 0 };
-let activeTemplate = 'classic';
+let selectedPreset = null;
+let photoShape = 'circle';
 
 function linesToList(text) {
   return text.split('\n').map(line => line.trim()).filter(Boolean);
@@ -124,68 +116,81 @@ function closeStartModal() {
   startModal.setAttribute('aria-hidden', 'true');
 }
 
-function setTemplate(template, variant = '') {
-  activeTemplate = template;
-  resume.className = `resume-preview template-${template}`;
-  document.body.dataset.template = template;
-  document.body.dataset.variant = variant;
-
-  document.querySelectorAll('[data-template]').forEach(btn => {
-    btn.classList.toggle('active', btn.dataset.template === template);
-    btn.classList.toggle('selected', btn.dataset.template === template);
-  });
-
-  document.querySelectorAll('[data-color]').forEach(btn => {
-    btn.classList.toggle('active', btn.dataset.color === variant);
-  });
+function setPhotoShape(shape) {
+  photoShape = shape;
+  photoEditorFrame.classList.toggle('circle', shape === 'circle');
+  photoEditorFrame.classList.toggle('square', shape === 'square');
+  previewPhoto.parentElement.classList.toggle('circle', shape === 'circle');
+  previewPhoto.parentElement.classList.toggle('square', shape === 'square');
+  shapeCircle.classList.toggle('active', shape === 'circle');
+  shapeSquare.classList.toggle('active', shape === 'square');
 }
 
-function createTemplateCard(template, variant, index) {
-  const button = document.createElement('button');
-  button.className = 'start-template';
-  button.dataset.template = template.id;
-  button.dataset.variant = variant.name;
-  button.style.setProperty('--preview-accent', variant.color);
-  button.innerHTML = `
-    <span class="template-preview ${template.id} ${variant.name}"></span>
-    <strong>${template.label}</strong>
-    <small>${template.desc} · ${variant.name}</small>
-  `;
-  button.addEventListener('click', () => {
-    setTemplate(template.id, variant.name);
-    closeStartModal();
-  });
-  return button;
-}
-
-function renderGallery() {
-  startGallery.innerHTML = '';
-  templateGrid.innerHTML = '';
-  const all = [];
-
-  baseTemplates.forEach(template => {
-    palette.forEach(variant => {
-      all.push({ template, variant });
+function renderPills() {
+  colorPills.innerHTML = '';
+  accents.forEach((accent, index) => {
+    const btn = document.createElement('button');
+    btn.className = 'color-pill';
+    btn.dataset.color = accent.name;
+    btn.style.background = accent.accent;
+    btn.title = accent.name;
+    btn.addEventListener('click', () => {
+      if (!selectedPreset) selectedPreset = { layout: layouts[index % layouts.length], accent: accent.name, accentColor: accent.accent, darkColor: accent.dark };
+      applyPreset({ ...selectedPreset, accent: accent.name, accentColor: accent.accent, darkColor: accent.dark });
     });
+    colorPills.appendChild(btn);
   });
+}
 
-  all.slice(0, 50).forEach(({ template, variant }, index) => {
-    const card = createTemplateCard(template, variant, index);
-    startGallery.appendChild(card);
+function createPreset(index) {
+  const layout = layouts[index % layouts.length];
+  const accent = accents[index % accents.length];
+  return {
+    id: `preset-${String(index + 1).padStart(2, '0')}`,
+    name: `Modelo ${index + 1}`,
+    desc: `A4 ${layout.toUpperCase()} · ${accent.name}`,
+    layout,
+    accent: accent.name,
+    accentColor: accent.accent,
+    darkColor: accent.dark,
+  };
+}
 
-    const tile = createTemplateCard(template, variant, index);
-    tile.className = 'template-card';
-    tile.innerHTML = `
-      <span class="template-preview ${template.id} ${variant.name}"></span>
-      <strong>${template.label}</strong>
-      <small>${template.desc}</small>
+function applyPreset(preset) {
+  selectedPreset = preset;
+  resume.className = `resume-preview`;
+  resume.dataset.layout = preset.layout;
+  resume.style.setProperty('--accent', preset.accentColor);
+  resume.style.setProperty('--accent-dark', preset.darkColor);
+  document.body.dataset.template = preset.layout;
+
+  document.querySelectorAll('.start-template').forEach(btn => {
+    btn.classList.toggle('selected', btn.dataset.preset === preset.id);
+  });
+  if (colorPills.children.length) {
+    [...colorPills.children].forEach(btn => btn.classList.toggle('active', btn.dataset.color === preset.accent));
+  }
+}
+
+function buildGallery() {
+  startGallery.innerHTML = '';
+  for (let i = 0; i < presetCount; i++) {
+    const preset = createPreset(i);
+    const btn = document.createElement('button');
+    btn.className = 'start-template';
+    btn.dataset.preset = preset.id;
+    btn.dataset.layout = preset.layout;
+    btn.innerHTML = `
+      <span class="template-preview layout-${preset.layout} ${preset.accent}"></span>
+      <strong>${preset.name}</strong>
+      <small>${preset.desc}</small>
     `;
-    tile.addEventListener('click', () => {
-      setTemplate(template.id, variant.name);
+    btn.addEventListener('click', () => {
+      applyPreset(preset);
       closeStartModal();
     });
-    templateGrid.appendChild(tile);
-  });
+    startGallery.appendChild(btn);
+  }
 }
 
 Object.values(inputs).forEach(input => input.addEventListener('input', syncPreview));
@@ -235,15 +240,12 @@ photoCancel.addEventListener('click', () => {
 photoAccept.addEventListener('click', () => {
   previewPhoto.src = pendingPhotoData;
   previewPhoto.style.transform = photoTransform();
+  setPhotoShape(photoShape);
   closePhotoModal();
 });
 
 photoModal.addEventListener('click', event => {
   if (event.target === photoModal) closePhotoModal();
-});
-
-scrollToTemplates.addEventListener('click', () => {
-  document.getElementById('templatesSection').scrollIntoView({ behavior: 'smooth', block: 'start' });
 });
 
 openExport.addEventListener('click', () => {
@@ -273,22 +275,24 @@ downloadPdf.addEventListener('click', () => {
   window.print();
 });
 
+scrollToTop.addEventListener('click', () => {
+  startModal.classList.add('open');
+  startModal.setAttribute('aria-hidden', 'false');
+});
+
 closeStart.addEventListener('click', closeStartModal);
 
 chooseTemplate.addEventListener('click', () => {
-  const selected = startGallery.querySelector('.start-template.selected') || startGallery.querySelector('.start-template');
-  if (selected) setTemplate(selected.dataset.template, selected.dataset.variant);
+  if (selectedPreset) applyPreset(selectedPreset);
   closeStartModal();
 });
 
-document.addEventListener('click', event => {
-  const tile = event.target.closest('.start-template, .template-card');
-  if (!tile || !tile.dataset.template) return;
-  const variant = tile.dataset.variant || tile.dataset.color || '';
-  setTemplate(tile.dataset.template, variant);
-});
+shapeCircle.addEventListener('click', () => setPhotoShape('circle'));
+shapeSquare.addEventListener('click', () => setPhotoShape('square'));
 
-renderGallery();
+renderPills();
+buildGallery();
 syncPreview();
-setTemplate('classic', 'navy');
+applyPreset(createPreset(0));
+setPhotoShape('circle');
 startModal.classList.add('open');

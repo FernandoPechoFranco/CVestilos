@@ -49,18 +49,10 @@
       </div>
     </section>
 
-    <section class="panel" id="templatesSection">
-      <div class="section-title">
-        <h2>1. Elige tu plantilla</h2>
-        <p>Cuatro estilos listos para personalizar.</p>
-      </div>
-      <div class="template-grid" id="templateGrid"></div>
-    </section>
-
     <section class="builder">
       <div class="panel form-panel">
         <div class="section-title">
-          <h2>2. Edita tu CV</h2>
+          <h2>Edita tu CV</h2>
           <p>Todos los campos actualizan la vista previa al instante.</p>
         </div>
 
@@ -173,12 +165,16 @@ Inglés: Avanzado</textarea>
 
   <div class="photo-modal" id="photoModal" aria-hidden="true">
     <div class="photo-card">
-      <div class="section-title">
-        <h3>Ajustar foto</h3>
-        <p>Arrastra con el mouse y usa la rueda para acercar o alejar.</p>
-      </div>
-      <div class="photo-editor-shell">
-        <div class="photo-editor-frame">
+        <div class="section-title">
+          <h3>Ajustar foto</h3>
+          <p>Arrastra con el mouse y usa la rueda para acercar o alejar.</p>
+        </div>
+        <div class="shape-toggle">
+          <button class="shape-btn active" data-shape="circle" id="shapeCircle">Círculo</button>
+          <button class="shape-btn" data-shape="square" id="shapeSquare">Cuadrado</button>
+        </div>
+        <div class="photo-editor-shell">
+        <div class="photo-editor-frame circle" id="photoEditorFrame">
           <img id="photoEditorImage" alt="Editor de foto">
         </div>
         <div class="photo-controls">

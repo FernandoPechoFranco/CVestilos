@@ -1,18 +1,12 @@
 const resume = document.getElementById('resume');
 const modal = document.getElementById('exportModal');
 const startModal = document.getElementById('startModal');
-const photoModal = document.getElementById('photoModal');
 const photoInput = document.getElementById('photo');
 const previewPhoto = document.getElementById('previewPhoto');
-const photoEditorImage = document.getElementById('photoEditorImage');
-const photoCancel = document.getElementById('photoCancel');
-const photoAccept = document.getElementById('photoAccept');
 const closeStart = document.getElementById('closeStart');
 const chooseTemplate = document.getElementById('chooseTemplate');
 const colorPills = document.getElementById('colorPills');
 const startGallery = document.getElementById('startGallery');
-const photoFrame = document.querySelector('.photo-editor-frame');
-const photoEditorFrame = document.getElementById('photoEditorFrame');
 const shapeCircle = document.getElementById('shapeCircle');
 const shapeSquare = document.getElementById('shapeSquare');
 
@@ -50,11 +44,6 @@ const accents = [
   { name: 'graphite', accent: '#60a5fa', dark: '#111827' },
 ];
 
-let pendingPhotoData = '';
-let photoState = { zoom: 1, x: 0, y: 0 };
-let dragging = false;
-let dragStart = { x: 0, y: 0 };
-let dragOrigin = { x: 0, y: 0 };
 let selectedPreset = null;
 let photoShape = 'circle';
 
@@ -86,34 +75,6 @@ function syncPreview() {
   renderList(bindings.languages, inputs.languages.value);
 }
 
-function photoTransform() {
-  return `translate(-50%, -50%) translate(${photoState.x}px, ${photoState.y}px) scale(${photoState.zoom})`;
-}
-
-function applyPhotoTransform() {
-  photoEditorImage.style.transform = photoTransform();
-}
-
-function applyPreviewPhotoTransform() {
-  previewPhoto.style.transform = photoTransform();
-}
-
-function openPhotoModal(src) {
-  pendingPhotoData = src;
-  photoEditorImage.src = src;
-  photoState = { zoom: 1, x: 0, y: 0 };
-  photoModal.classList.add('open');
-  photoModal.setAttribute('aria-hidden', 'false');
-  applyPhotoTransform();
-}
-
-function closePhotoModal() {
-  photoModal.classList.remove('open');
-  photoModal.setAttribute('aria-hidden', 'true');
-  dragging = false;
-  photoFrame.classList.remove('dragging');
-}
-
 function closeStartModal() {
   startModal.classList.remove('open');
   startModal.setAttribute('aria-hidden', 'true');
@@ -121,8 +82,6 @@ function closeStartModal() {
 
 function setPhotoShape(shape) {
   photoShape = shape;
-  photoEditorFrame.classList.toggle('circle', shape === 'circle');
-  photoEditorFrame.classList.toggle('square', shape === 'square');
   previewPhoto.parentElement.classList.toggle('circle', shape === 'circle');
   previewPhoto.parentElement.classList.toggle('square', shape === 'square');
   shapeCircle.classList.toggle('active', shape === 'circle');
@@ -202,53 +161,12 @@ photoInput.addEventListener('change', () => {
   const file = photoInput.files && photoInput.files[0];
   if (!file) return;
   const reader = new FileReader();
-  reader.onload = event => openPhotoModal(event.target.result);
+  reader.onload = event => {
+    previewPhoto.src = event.target.result;
+    previewPhoto.style.transform = 'translate(-50%, -50%) scale(1)';
+    setPhotoShape(photoShape);
+  };
   reader.readAsDataURL(file);
-});
-
-photoEditorImage.addEventListener('wheel', event => {
-  event.preventDefault();
-  const delta = event.deltaY > 0 ? -0.08 : 0.08;
-  photoState.zoom = Math.min(3, Math.max(1, photoState.zoom + delta));
-  applyPhotoTransform();
-}, { passive: false });
-
-photoEditorImage.addEventListener('pointerdown', event => {
-  dragging = true;
-  dragStart = { x: event.clientX, y: event.clientY };
-  dragOrigin = { x: photoState.x, y: photoState.y };
-  photoFrame.classList.add('dragging');
-  photoEditorImage.setPointerCapture(event.pointerId);
-});
-
-photoEditorImage.addEventListener('pointermove', event => {
-  if (!dragging) return;
-  photoState.x = dragOrigin.x + (event.clientX - dragStart.x);
-  photoState.y = dragOrigin.y + (event.clientY - dragStart.y);
-  applyPhotoTransform();
-});
-
-['pointerup', 'pointercancel', 'pointerleave'].forEach(evt => {
-  photoEditorImage.addEventListener(evt, () => {
-    dragging = false;
-    photoFrame.classList.remove('dragging');
-  });
-});
-
-photoCancel.addEventListener('click', () => {
-  photoInput.value = '';
-  closePhotoModal();
-});
-
-photoAccept.addEventListener('click', () => {
-  previewPhoto.src = pendingPhotoData;
-  applyPreviewPhotoTransform();
-  setPhotoShape(photoShape);
-  closePhotoModal();
-});
-
-photoModal.addEventListener('click', event => {
-  if (event.target === photoModal) closePhotoModal();
 });
 
 openExport.addEventListener('click', () => {

@@ -95,9 +95,15 @@ Universidad de Madrid | 2015 - 2016</textarea>
             <textarea id="languages" rows="4">Español: Nativo
 Inglés: Avanzado</textarea>
           </label>
-          <label>Foto
-            <input id="photo" type="file" accept="image/*">
-          </label>
+          <div class="photo-field">
+            <label>Foto
+              <input id="photo" type="file" accept="image/*">
+            </label>
+            <div class="photo-shape-controls" aria-label="Forma de foto">
+              <button class="shape-btn active" type="button" data-shape="circle" id="shapeCircle">Círculo</button>
+              <button class="shape-btn" type="button" data-shape="square" id="shapeSquare">Cuadrado</button>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -160,31 +166,6 @@ Inglés: Avanzado</textarea>
         <button class="btn btn-primary" id="downloadPdf">Descargar PDF</button>
       </div>
       <button class="link-button" id="closeExport">Cancelar</button>
-    </div>
-  </div>
-
-  <div class="photo-modal" id="photoModal" aria-hidden="true">
-    <div class="photo-card">
-        <div class="section-title">
-          <h3>Ajustar foto</h3>
-          <p>Arrastra con el mouse y usa la rueda para acercar o alejar.</p>
-        </div>
-        <div class="shape-toggle">
-          <button class="shape-btn active" data-shape="circle" id="shapeCircle">Círculo</button>
-          <button class="shape-btn" data-shape="square" id="shapeSquare">Cuadrado</button>
-        </div>
-        <div class="photo-editor-shell">
-        <div class="photo-editor-frame circle" id="photoEditorFrame">
-          <img id="photoEditorImage" alt="Editor de foto">
-        </div>
-        <div class="photo-controls">
-          <p class="photo-hint">Mantén clic izquierdo para mover la foto. Rueda del mouse para zoom.</p>
-        </div>
-      </div>
-      <div class="export-actions">
-        <button class="btn btn-secondary" id="photoCancel">Cancelar</button>
-        <button class="btn btn-primary" id="photoAccept">Aceptar</button>
-      </div>
     </div>
   </div>
 

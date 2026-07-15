@@ -196,6 +196,30 @@ img { max-width: 100%; display: block; }
 .form-grid, .two-col { display: grid; gap: 12px; }
 .form-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 .two-col { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.photo-field {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 10px;
+  align-items: end;
+}
+.photo-shape-controls {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 14px;
+}
+.shape-btn {
+  border: 1px solid var(--border);
+  background: #fff;
+  padding: 11px 12px;
+  border-radius: 999px;
+  font-weight: 700;
+  cursor: pointer;
+  white-space: nowrap;
+}
+.shape-btn.active {
+  background: #101828;
+  color: #fff;
+}
 
 .resume-preview {
   min-height: 1120px; background: #fff; border-radius: 24px; overflow: hidden; display: grid; box-shadow: 0 18px 40px rgba(15, 23, 42, .12);
@@ -371,106 +395,17 @@ img { max-width: 100%; display: block; }
 .start-template strong { display: block; margin-top: 8px; font-size: 16px; }
 .start-template small { display: block; margin-top: 4px; color: var(--muted); }
 
-.photo-modal {
-  position: fixed; inset: 0; background: rgba(15, 23, 42, .72); display: none;
-  align-items: center; justify-content: center; padding: 20px; z-index: 40;
-}
-.photo-modal.open { display: flex; }
-.photo-card {
-  width: min(720px, 100%);
-  background: #fff;
-  border-radius: 24px;
-  padding: 24px;
-  box-shadow: var(--shadow);
-}
-.photo-editor-shell {
-  display: grid;
-  grid-template-columns: minmax(280px, 1fr) minmax(220px, 280px);
-  gap: 18px;
-  align-items: start;
-}
-.shape-toggle {
-  display: flex;
-  gap: 10px;
-  margin-bottom: 14px;
-}
-.shape-btn {
-  border: 1px solid var(--border);
-  background: #fff;
-  padding: 10px 14px;
-  border-radius: 999px;
-  font-weight: 700;
-  cursor: pointer;
-}
-.shape-btn.active {
-  background: #101828;
-  color: #fff;
-}
-.photo-editor-frame {
-  position: relative;
-  width: 100%;
-  aspect-ratio: 1 / 1;
-  overflow: hidden;
-  border-radius: 22px;
-  background: linear-gradient(135deg, #e9edf3, #cfd7e3);
-  border: 1px solid var(--border);
-}
-.photo-editor-frame.square { border-radius: 18px; }
-.photo-editor-frame.circle { border-radius: 999px; }
-.photo-editor-frame::after {
-  content: "Arrastra para mover";
-  position: absolute;
-  inset: auto 12px 12px auto;
-  background: rgba(15, 23, 42, .72);
-  color: #fff;
-  font-size: 12px;
-  font-weight: 700;
-  padding: 6px 10px;
-  border-radius: 999px;
-  pointer-events: none;
-  z-index: 2;
-}
-.photo-editor-frame img {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  object-position: center center;
-  transform: translate(-50%, -50%) scale(1) translate(0px, 0px);
-  transform-origin: center center;
-  user-select: none;
-  pointer-events: auto;
-  cursor: grab;
-}
-.photo-editor-frame.dragging img { cursor: grabbing; }
-.photo-hint {
-  margin: 0;
-  color: var(--muted);
-  line-height: 1.5;
-}
-.crop-label {
-  position: absolute;
-  inset: 12px auto auto 12px;
-  background: rgba(15, 23, 42, .72);
-  color: #fff;
-  border-radius: 999px;
-  padding: 6px 10px;
-  font-size: 12px;
-  font-weight: 700;
-}
-
 @media (max-width: 1100px) {
   .builder { grid-template-columns: 1fr; }
   .template-grid, .form-grid, .two-col { grid-template-columns: 1fr 1fr; }
-  .photo-editor-shell { grid-template-columns: 1fr; }
   .start-gallery { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
 
 @media (max-width: 760px) {
   .hero, .section-title, .export-actions { flex-direction: column; align-items: stretch; }
   .template-grid, .form-grid, .two-col { grid-template-columns: 1fr; }
+  .photo-field { grid-template-columns: 1fr; }
+  .photo-shape-controls { margin-bottom: 0; }
   .start-gallery { grid-template-columns: 1fr; }
   .app-shell { padding: 12px; }
   .resume-preview { min-height: auto; }

@@ -1,11 +1,197 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CV Builder</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/css/estilos.css">
 </head>
 <body>
-    <h1>Hola Mundo</h1>
+  <div class="start-modal open" id="startModal" aria-hidden="false">
+    <div class="start-card">
+      <div class="start-head">
+        <div>
+          <p class="eyebrow dark">Nuevo CV</p>
+          <h1>Elige una plantilla</h1>
+          <p class="start-copy">Selecciona un estilo y luego modifica tu CV.</p>
+        </div>
+        <button class="close-icon" id="closeStart" aria-label="Cerrar">×</button>
+      </div>
+
+      <div class="start-toolbar">
+        <span class="toolbar-label">Colores</span>
+        <div class="color-pills" id="colorPills">
+          <button class="color-pill active" data-color="classic" title="Classic"></button>
+          <button class="color-pill" data-color="sidebar" title="Sidebar"></button>
+          <button class="color-pill" data-color="modern" title="Modern"></button>
+          <button class="color-pill" data-color="executive" title="Executive"></button>
+        </div>
+        <button class="btn btn-primary" id="chooseTemplate">Seleccionar esta plantilla</button>
+      </div>
+
+      <div class="start-gallery" id="startGallery"></div>
+    </div>
+  </div>
+
+  <main class="app-shell">
+    <section class="hero">
+      <div>
+        <p class="eyebrow">Creador de CV</p>
+        <h1>Nuevo CV</h1>
+        <p class="hero-copy">Selecciona una plantilla, edita tu información y exporta tu CV.</p>
+      </div>
+      <div class="hero-actions">
+        <button class="btn btn-secondary" id="scrollToTemplates">Ver modelos</button>
+        <button class="btn btn-primary" id="openExport">Exportar</button>
+      </div>
+    </section>
+
+    <section class="panel" id="templatesSection">
+      <div class="section-title">
+        <h2>1. Elige tu plantilla</h2>
+        <p>Cuatro estilos listos para personalizar.</p>
+      </div>
+      <div class="template-grid" id="templateGrid"></div>
+    </section>
+
+    <section class="builder">
+      <div class="panel form-panel">
+        <div class="section-title">
+          <h2>2. Edita tu CV</h2>
+          <p>Todos los campos actualizan la vista previa al instante.</p>
+        </div>
+
+        <div class="form-grid">
+          <label>Nombre completo<input id="name" type="text" value="Javiera Blanch"></label>
+          <label>Cargo<input id="headline" type="text" value="Product Manager productos digitales"></label>
+          <label>Email<input id="email" type="email" value="javierablanch@gmail.com"></label>
+          <label>Teléfono<input id="phone" type="text" value="+34 698 557 002"></label>
+          <label>Web<input id="website" type="text" value="javierablanch.cyu"></label>
+          <label>Ubicación<input id="location" type="text" value="Madrid, España"></label>
+        </div>
+
+        <label>Perfil profesional
+          <textarea id="summary" rows="5">Responsable de estrategia digital con experiencia en producto, comunicación y analítica. Enfocada en resultados, coordinación de equipos y mejora continua.</textarea>
+        </label>
+
+        <div class="two-col">
+          <label>Experiencia 1
+            <textarea id="experience1" rows="5">Ecommerce Product Owner | 2019 - Presente
+Lideré la optimización de procesos digitales, analítica de negocio y coordinación entre equipos técnicos y comerciales.</textarea>
+          </label>
+          <label>Experiencia 2
+            <textarea id="experience2" rows="5">Tech Lead | 2016 - 2019
+Gestioné prioridades del producto, definí roadmap y trabajé con stakeholders para lanzar nuevas funcionalidades.</textarea>
+          </label>
+        </div>
+
+        <div class="two-col">
+          <label>Educación
+            <textarea id="education" rows="4">Master en Marketing Digital
+Universidad de Madrid | 2015 - 2016</textarea>
+          </label>
+          <label>Habilidades
+            <textarea id="skills" rows="4">Product strategy, SEO, Google Analytics, Notion, Figma, liderazgo, comunicación, gestión de proyectos</textarea>
+          </label>
+        </div>
+
+        <div class="two-col">
+          <label>Idiomas
+            <textarea id="languages" rows="4">Español: Nativo
+Inglés: Avanzado</textarea>
+          </label>
+          <label>Foto
+            <input id="photo" type="file" accept="image/*">
+          </label>
+        </div>
+      </div>
+
+      <div class="panel preview-panel">
+        <div class="section-title">
+          <h2>Vista previa</h2>
+          <p>Así se verá tu CV con el modelo elegido.</p>
+        </div>
+
+        <article class="resume-preview template-classic" id="resume">
+          <aside class="resume-sidebar">
+            <div class="photo-wrap">
+              <img id="previewPhoto" src="assets/image/profile-placeholder.svg" alt="Foto de perfil">
+            </div>
+            <div class="resume-nameblock">
+              <h3 id="previewName">Javiera Blanch</h3>
+              <p id="previewHeadline">Product Manager productos digitales</p>
+            </div>
+            <div class="resume-contact">
+              <p><span>Email</span><strong id="previewEmail">javierablanch@gmail.com</strong></p>
+              <p><span>Teléfono</span><strong id="previewPhone">+34 698 557 002</strong></p>
+              <p><span>Web</span><strong id="previewWebsite">javierablanch.cyu</strong></p>
+              <p><span>Ubicación</span><strong id="previewLocation">Madrid, España</strong></p>
+            </div>
+            <div class="resume-section">
+              <h4>Habilidades</h4>
+              <ul id="previewSkills"></ul>
+            </div>
+            <div class="resume-section">
+              <h4>Idiomas</h4>
+              <ul id="previewLanguages"></ul>
+            </div>
+          </aside>
+          <section class="resume-main">
+            <div class="resume-section">
+              <h4>Perfil profesional</h4>
+              <p id="previewSummary"></p>
+            </div>
+            <div class="resume-section">
+              <h4>Experiencia laboral</h4>
+              <p id="previewExperience1"></p>
+              <p id="previewExperience2"></p>
+            </div>
+            <div class="resume-section">
+              <h4>Formación académica</h4>
+              <p id="previewEducation"></p>
+            </div>
+          </section>
+        </article>
+      </div>
+    </section>
+  </main>
+
+  <div class="export-modal" id="exportModal" aria-hidden="true">
+    <div class="export-card">
+      <h3>Exportar CV</h3>
+      <p>Elige cómo quieres sacar el documento.</p>
+      <div class="export-actions">
+        <button class="btn btn-secondary" id="printCv">Imprimir</button>
+        <button class="btn btn-primary" id="downloadPdf">Descargar PDF</button>
+      </div>
+      <button class="link-button" id="closeExport">Cancelar</button>
+    </div>
+  </div>
+
+  <div class="photo-modal" id="photoModal" aria-hidden="true">
+    <div class="photo-card">
+      <div class="section-title">
+        <h3>Ajustar foto</h3>
+        <p>Arrastra con el mouse y usa la rueda para acercar o alejar.</p>
+      </div>
+      <div class="photo-editor-shell">
+        <div class="photo-editor-frame">
+          <img id="photoEditorImage" alt="Editor de foto">
+        </div>
+        <div class="photo-controls">
+          <p class="photo-hint">Mantén clic izquierdo para mover la foto. Rueda del mouse para zoom.</p>
+        </div>
+      </div>
+      <div class="export-actions">
+        <button class="btn btn-secondary" id="photoCancel">Cancelar</button>
+        <button class="btn btn-primary" id="photoAccept">Aceptar</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="assets/js/javascrip.js"></script>
 </body>
 </html>

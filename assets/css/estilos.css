@@ -434,6 +434,7 @@ img { max-width: 100%; display: block; }
   border: 4px solid rgba(255,255,255,.14);
   margin-bottom: 18px;
   background: rgba(255,255,255,.08);
+  touch-action: none;
 }
 .resume-sidebar .photo-wrap img {
   position: absolute;
@@ -448,6 +449,10 @@ img { max-width: 100%; display: block; }
   object-position: center center;
   transform: translate(-50%, -50%) scale(1);
   transform-origin: center center;
+  cursor: grab;
+}
+.resume-sidebar .photo-wrap img.dragging {
+  cursor: grabbing;
 }
 .resume-sidebar .photo-wrap.circle { border-radius: 999px; }
 .resume-sidebar .photo-wrap.square { border-radius: 18px; }

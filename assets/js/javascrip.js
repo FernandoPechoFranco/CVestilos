@@ -10,6 +10,16 @@ const startGallery = document.getElementById('startGallery');
 const shapeCircle = document.getElementById('shapeCircle');
 const shapeSquare = document.getElementById('shapeSquare');
 
+const photoTransform = {
+  x: 0,
+  y: 0,
+  scale: 1,
+  dragging: false,
+  pointerId: null,
+  startX: 0,
+  startY: 0,
+};
+
 const bindings = {
   name: document.getElementById('previewName'),
   headline: document.getElementById('previewHeadline'),
@@ -17,6 +27,7 @@ const bindings = {
   phone: document.getElementById('previewPhone'),
   website: document.getElementById('previewWebsite'),
   location: document.getElementById('previewLocation'),
+  salary: document.getElementById('previewSalary'),
   summary: document.getElementById('previewSummary'),
   experience1: document.getElementById('previewExperience1'),
   experience2: document.getElementById('previewExperience2'),
@@ -27,7 +38,7 @@ const bindings = {
   languages: document.getElementById('previewLanguages'),
 };
 
-const inputs = ['name', 'headline', 'email', 'phone', 'website', 'location', 'summary', 'experience1', 'experience2', 'experience3', 'experience4', 'education', 'skills']
+const inputs = ['name', 'headline', 'email', 'phone', 'website', 'location', 'salary', 'summary', 'experience1', 'experience2', 'experience3', 'experience4', 'education', 'skills']
   .reduce((acc, id) => ({ ...acc, [id]: document.getElementById(id) }), {});
 
 const scrollToTop = document.getElementById('scrollToTemplates');
@@ -105,9 +116,9 @@ function hideEmptyPreviewSections() {
   toggleSection(document.querySelector('.resume-section.skills'), Boolean(inputs.skills.value.trim()));
   toggleSection(document.querySelector('.resume-section.languages'), Boolean(getLanguageEntries().length));
   toggleSection(document.querySelector('.resume-nameblock'), Boolean(inputs.name.value.trim() || inputs.headline.value.trim()));
-  toggleSection(document.querySelector('.resume-contact'), ['email', 'phone', 'website', 'location'].some(id => inputs[id].value.trim()));
+  toggleSection(document.querySelector('.resume-contact'), ['email', 'phone', 'website', 'location', 'salary'].some(id => inputs[id].value.trim()));
 
-  ['email', 'phone', 'website', 'location'].forEach(id => {
+  ['email', 'phone', 'website', 'location', 'salary'].forEach(id => {
     const strong = bindings[id];
     if (strong) {
       const parent = strong.parentElement;
@@ -123,6 +134,7 @@ function syncPreview() {
   bindings.phone.textContent = inputs.phone.value;
   bindings.website.textContent = inputs.website.value;
   bindings.location.textContent = inputs.location.value;
+  bindings.salary.textContent = inputs.salary.value;
   bindings.summary.textContent = inputs.summary.value;
   bindings.experience1.textContent = inputs.experience1.value;
   bindings.experience2.textContent = inputs.experience2.value;
@@ -146,6 +158,68 @@ function setPhotoShape(shape) {
   shapeCircle.classList.toggle('active', shape === 'circle');
   shapeSquare.classList.toggle('active', shape === 'square');
 }
+
+function updatePhotoTransform() {
+  previewPhoto.style.transform = `translate(calc(-50% + ${photoTransform.x}px), calc(-50% + ${photoTransform.y}px)) scale(${photoTransform.scale})`;
+}
+
+function resetPhotoTransform() {
+  photoTransform.x = 0;
+  photoTransform.y = 0;
+  photoTransform.scale = 1;
+  updatePhotoTransform();
+}
+
+function clamp(value, min, max) {
+  return Math.min(Math.max(value, min), max);
+}
+
+previewPhoto.addEventListener('pointerdown', event => {
+  if (event.button !== 2) return;
+  event.preventDefault();
+  previewPhoto.setPointerCapture(event.pointerId);
+  photoTransform.dragging = true;
+  photoTransform.pointerId = event.pointerId;
+  photoTransform.startX = event.clientX;
+  photoTransform.startY = event.clientY;
+  previewPhoto.classList.add('dragging');
+});
+
+previewPhoto.addEventListener('pointermove', event => {
+  if (!photoTransform.dragging || event.pointerId !== photoTransform.pointerId) return;
+  const deltaX = event.clientX - photoTransform.startX;
+  const deltaY = event.clientY - photoTransform.startY;
+  photoTransform.x += deltaX;
+  photoTransform.y += deltaY;
+  photoTransform.startX = event.clientX;
+  photoTransform.startY = event.clientY;
+  updatePhotoTransform();
+});
+
+previewPhoto.addEventListener('pointerup', event => {
+  if (event.pointerId !== photoTransform.pointerId) return;
+  photoTransform.dragging = false;
+  photoTransform.pointerId = null;
+  previewPhoto.releasePointerCapture(event.pointerId);
+  previewPhoto.classList.remove('dragging');
+});
+
+previewPhoto.addEventListener('pointercancel', () => {
+  photoTransform.dragging = false;
+  photoTransform.pointerId = null;
+  previewPhoto.classList.remove('dragging');
+});
+
+previewPhoto.addEventListener('contextmenu', event => {
+  event.preventDefault();
+});
+
+previewPhoto.addEventListener('wheel', event => {
+  event.preventDefault();
+  const delta = event.deltaY > 0 ? -0.08 : 0.08;
+  photoTransform.scale = clamp(photoTransform.scale + delta, 0.6, 2.5);
+  updatePhotoTransform();
+});
 
 function renderPills() {
   colorPills.innerHTML = '';
